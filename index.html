@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>    
+    <script type="text/javascript" src="frontendScript.js"></script>
+    
+</head>
+<body>
+    <form id="babgne" action="">
+        <input type="text", placeholder="input your todo">
+        <button id="button">Submit</button>
+    </form>
+
+    <ul id="list">
+
+    </ul>
+</body>
+
+<script>
+
+
+$(document).ready(function(){
+        $("#button").click(function(){
+            fetch('api/todos').then(result => result.json())
+            .then(result => {
+                alert(result);
+            })
+            .catch(function(error) {
+                alert(error.toString())
+            });   
+        });
+});
+
+</script>
+
+</html>
