@@ -9,7 +9,7 @@
 </head>
 <body>
     <form id="babgne" action="">
-        <input type="text", placeholder="input your todo">
+        <input id="input" type="text", placeholder="input your todo">
         <button id="button">Submit</button>
     </form>
 
@@ -21,16 +21,56 @@
 <script>
 
 
+var list = (result) => {
+    return `<li>${result}</li>`;
+} 
+
+var zaven = (root, component)=>{
+    root.innerHTML = component;
+}
+var ul = document.getElementById('list');
+
+var toDo = (todo) => {
+    let html = "";
+    todo.forEach(task => {
+        html += list(task) 
+    });
+
+    return html;
+}
+ 
 $(document).ready(function(){
-        $("#button").click(function(){
-            fetch('api/todos').then(result => result.json())
-            .then(result => {
-                alert(result);
-            })
-            .catch(function(error) {
-                alert(error.toString())
-            });   
-        });
+
+    const reqUrl = "/api/todos";
+    const reqConf = {
+        method: 'GET'
+    };
+
+    fetch(reqUrl, reqConf).then(result => {return result.json()}) 
+    .then(result => { 
+        zaven(ul, toDo(result));
+        
+    })
+    .catch(function(error) {
+        alert(error.toString())
+    });   
+        
+
+    $('#button').click(function(){
+        const element = $('#input').val();
+        fetch("/api/todos", {
+            method: "POST",
+            body: JSON.stringify(element)
+        }).then(result => {return result.json()}) 
+    .then(result => { 
+        zaven(ul, toDo(result));
+        
+    })
+    .catch(function(error) {
+        alert(error.toString())
+    });   
+    })
+    
 });
 
 </script>
