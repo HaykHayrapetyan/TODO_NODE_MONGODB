@@ -4,14 +4,11 @@
     
     <title>Document</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>    
-    <script type="text/javascript" src="frontendScript.js"></script>
+    <!--<script type="text/javascript" src="frontendScript.js"></script>-->
     
 </head>
 <body>
-    <form id="babgne" action="">
-        <input id="input" type="text", placeholder="input your todo">
-        <button id="button">Submit</button>
-    </form>
+    <div id="body"></div>
 
     <ul id="list">
 
@@ -20,10 +17,44 @@
 
 <script>
 
+let todo = [];
 
-var list = (result) => {
-    return `<li>${result}</li>`;
+var list = (result, id) => {
+    return `<li id="todo${id}">${result}</li>
+            <button onclick="deleteFunction(${id})" type="button">Delete</button>
+            <button onclick="editFunction(${id})" type="button">Edit</button>
+    `;
 } 
+    const forma = document.getElementById('forma');
+    const form = (value, subEd, id) => {
+        return `<input id="input" type="text" placeholder="input your todo" value="${value}">
+                <button onclick="${subEd}(${id})" type="button">${subEd}</button>`
+    }
+
+    const deleteFunction = (id) => {
+
+        
+        const reqUrl = "/api/todos/"+id;
+        const reqConf = getReqConf("DELETE");
+        fetch(reqUrl, reqConf)
+        .then(result => {
+            return result.json()
+        }) 
+        .then(result => {
+           zaven(ul, toDo(result));
+            
+        })
+        .catch(function(error) {
+            alert(error.toString())
+        });   
+    }
+
+    const editFunction = (id) => {
+        const value =document.getElementById(`todo${id}`).innerHTML;
+        let f = form(value, "edit", id)
+
+        zaven(document.getElementById('body'), f) 
+    }
 
 var zaven = (root, component)=>{
     root.innerHTML = component;
@@ -33,43 +64,85 @@ var ul = document.getElementById('list');
 var toDo = (todo) => {
     let html = "";
     todo.forEach(task => {
-        html += list(task) 
+        html += list(task.title, task.id); 
     });
 
     return html;
 }
+
+getReqConf = (method, body) => {
+    let reqConf = {
+        method,
+        credentials: "include",
+        headers: {
+            "Content-Type" : "application/json"
+        }
+    }
+
+    if (body) {
+        reqConf.body = JSON.stringify(body);
+    }
+
+    return reqConf;
+}
+
+const submit = () => {
+        const element = $('#input').val();
+        const reqUrl = "/api/todos";
+        const reqConf = getReqConf("POST", {todo: element});
+        fetch(reqUrl, reqConf)
+        .then(result => {
+            return result.json()
+        }) 
+        .then(result => {
+           console.log("result", result);
+           zaven(ul, toDo(result));
+            
+        })
+        .catch(function(error) {
+            alert(error.toString())
+        });  
+        $('#input').val('')
+    }
+
+const edit = (id) => {
+    let title = $('#input').val();
+    const reqUrl = "/api/todos/"+id;
+        const reqConf = getReqConf("PUT", {title});
+        fetch(reqUrl, reqConf)
+        .then(result => {
+            return result.json()
+        }) 
+        .then(result => {
+           console.log("result", result);
+           zaven(ul, toDo(result));
+            
+        })
+        .catch(function(error) {
+            console.log(error.toString())
+        });   
+}
+
  
-$(document).ready(function(){
+$(document).ready(() => {
+    const body =document.getElementById('body');
+    let d = form('', 'submit');
+    zaven(body, d)
 
     const reqUrl = "/api/todos";
-    const reqConf = {
-        method: 'GET'
-    };
+    const reqConf = getReqConf('GET');
 
-    fetch(reqUrl, reqConf).then(result => {return result.json()}) 
+    fetch(reqUrl, reqConf).then(result => {
+        return result.json()
+    }) 
     .then(result => { 
+        todo = result;
         zaven(ul, toDo(result));
         
     })
     .catch(function(error) {
-        alert(error.toString())
+        console.log(error.toString())
     });   
-        
-
-    $('#button').click(function(){
-        const element = $('#input').val();
-        fetch("/api/todos", {
-            method: "POST",
-            body: JSON.stringify(element)
-        }).then(result => {return result.json()}) 
-    .then(result => { 
-        zaven(ul, toDo(result));
-        
-    })
-    .catch(function(error) {
-        alert(error.toString())
-    });   
-    })
     
 });
 
