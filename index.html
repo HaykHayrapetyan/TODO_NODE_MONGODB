@@ -4,7 +4,6 @@
     
     <title>Document</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>    
-    <!--<script type="text/javascript" src="frontendScript.js"></script>-->
     
 </head>
 <body>
@@ -64,7 +63,7 @@ var ul = document.getElementById('list');
 var toDo = (todo) => {
     let html = "";
     todo.forEach(task => {
-        html += list(task.title, task.id); 
+        html += list(task.title, task._id); 
     });
 
     return html;
@@ -137,6 +136,7 @@ $(document).ready(() => {
     }) 
     .then(result => { 
         todo = result;
+        console.log(result)
         zaven(ul, toDo(result));
         
     })

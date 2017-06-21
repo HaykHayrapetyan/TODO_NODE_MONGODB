@@ -1,11 +1,14 @@
 const express = require('express');
 const api = express.Router();
+const mongose = require('./db');
 let id = 1;
 const todos = [];
 
 
+
 api.get('/todos', (req, res) => {
-    res.json(todos);
+    res.json(mongose)
+   // res.json(todos);
 });
 
 api.post('/todos', (req, res) => {
